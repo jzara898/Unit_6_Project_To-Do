@@ -69,3 +69,7 @@ input[type="checkbox"] + span {
 input[type="checkbox"]:checked + span {
     background:url(checkbox-filled.svg) left top no-repeat;
 }
+.edited label {
+    font-style: italic;
+    color: #ccc;
+}
