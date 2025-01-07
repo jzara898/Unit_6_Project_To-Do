@@ -7,9 +7,14 @@ angular.module('todoListApp')
         todo.edited = true;
     };
 
-    $scope.editing = false;
+    $scope.editing = !$scope.todo.id; // Start in editing mode for new todos
 
     $scope.setEdited = function(todo) {
+        todo.edited = true;
+    };
+
+    $scope.finishEditing = function(todo) {
+        $scope.editing = false;
         todo.edited = true;
     };
 });

@@ -6,6 +6,7 @@ import com.teamtreehouse.techdegrees.dao.TodoDao;
 import com.teamtreehouse.techdegrees.model.Todo;
 import org.sql2o.Sql2o;
 
+import java.io.File;
 import static spark.Spark.*;
 
 public class App {
@@ -13,7 +14,28 @@ public class App {
         staticFileLocation("/public");
 
         // Database configuration for persistent storage
-        String connectionString = "jdbc:h2:./data/todos";
+        String connectionString;
+        if (args != null && args.length > 0 && args[0].contains(":mem:")) {
+            // Use in-memory database if specified (for tests)
+            connectionString = args[0];
+        } else {
+            // Ensure data directory exists
+            File dataDir = new File("data");
+            if (!dataDir.exists()) {
+                System.out.println("Creating data directory: " + dataDir.getAbsolutePath());
+                if (!dataDir.mkdir()) {
+                    System.err.println("Failed to create data directory!");
+                }
+            }
+
+            // Use absolute path for database file
+            File dbFile = new File(dataDir, "todos").getAbsoluteFile();
+            // Use simpler connection string with just DB_CLOSE_DELAY
+            connectionString = "jdbc:h2:" + dbFile.getPath() + ";DB_CLOSE_DELAY=-1";
+            System.out.println("Using database at: " + connectionString);
+        }
+
+        // Initialize database connection
         Sql2o sql2o = new Sql2o(connectionString, "", "");
         TodoDao todoDao = new Sql2oTodoDao(sql2o);
         Gson gson = new Gson();

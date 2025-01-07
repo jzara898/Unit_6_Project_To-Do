@@ -1,8 +1,14 @@
 <div class="item" ng-class="{'editing-item': editing, 'completed': todo.iscompleted}" ng-repeat="todo in todos" ng-controller="todoCtrl">
-    <input type="checkbox" ng-model="todo.iscompleted" ng-change="todo.edited = true"/>
+    <input type="checkbox" ng-model="todo.iscompleted" ng-change="setEdited(todo)"/>
     <span ng-click="toggleCompleted(todo)"></span>
     <label ng-hide="editing" ng-click="editing = true">{{todo.name}}</label>
-    <input ng-show="editing" ng-blur="editing = false" class="editing-label" type="text" ng-model="todo.name" ng-change="todo.edited = true"/>
+    <input ng-show="editing"
+           ng-model="todo.name"
+           ng-change="setEdited(todo)"
+           ng-model-options="{ updateOn: 'blur' }"
+           class="editing-label"
+           type="text"
+           ng-blur="finishEditing(todo)"/>
     <div class="actions">
         <a href="" ng-click="saveTodos()">Save</a>
         <a href="" class="delete" ng-click="deleteTodo(todo, $index)">Delete</a>

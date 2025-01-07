@@ -9,17 +9,26 @@ angular.module('todoListApp')
     var todo = new Todo();
     todo.name = 'New Todo';
     todo.iscompleted = false;
+    todo.edited = true;
     $scope.todos.unshift(todo);
+    // Start in editing mode
+    $scope.editing = true;
   };
 
   $scope.saveTodos = function() {
+    // Force input blur to ensure model is updated
+    document.activeElement.blur();
+
     var savePromises = $scope.todos.map(function(todo) {
-      if (!todo.id) {
-        return Todo.save({}, todo).$promise;
-      } else if (todo.edited) {
-        return Todo.update({id: todo.id}, todo).$promise;
+      if (!todo.id || todo.edited) {
+        return Todo.save(todo).$promise.then(function(savedTodo) {
+          // Update the existing todo with saved data
+          angular.extend(todo, savedTodo);
+          todo.edited = false;
+          return todo;
+        });
       }
-      return $q.when(todo); // Return resolved promise for unchanged todos
+      return $q.when(todo);
     });
 
     $q.all(savePromises).then(function() {
