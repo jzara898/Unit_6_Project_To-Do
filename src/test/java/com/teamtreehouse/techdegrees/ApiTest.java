@@ -169,4 +169,29 @@ class ApiTest {
             this.body = body != null ? body : "";
         }
     }
+    @Test
+    void todoShouldPersistAfterRefresh() throws IOException {
+        // Create a new todo
+        Todo newTodo = new Todo("Persistence Check");
+        TestResponse createRes = request("POST", "/api/v1/todos", newTodo);
+        assertEquals(201, createRes.status);
+        Todo created = gson.fromJson(createRes.body, Todo.class);
+        assertNotNull(created.getId());
+
+        // Simulate page refresh by making a new GET request
+        TestResponse getAllRes = request("GET", "/api/v1/todos");
+        assertEquals(200, getAllRes.status);
+        Todo[] todos = gson.fromJson(getAllRes.body, Todo[].class);
+
+        // Verify todo exists in the response
+        boolean found = false;
+        for (Todo todo : todos) {
+            if (todo.getId() == created.getId()) {
+                found = true;
+                assertEquals("Persistence Check", todo.getName());
+                break;
+            }
+        }
+        assertTrue(found, "Todo should still exist after refresh");
+    }
 }

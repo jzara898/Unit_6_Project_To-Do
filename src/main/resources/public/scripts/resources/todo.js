@@ -6,12 +6,14 @@ angular.module('todoListApp')
     { id: '@id' },
     {
       update: {
-        method: 'PUT',
-        isArray: false
+        method: 'PUT'
       },
       save: {
-        method: 'POST',
-        isArray: false
+        method: 'POST'
+      },
+      query: {
+        method: 'GET',
+        isArray: true
       }
     }
   );

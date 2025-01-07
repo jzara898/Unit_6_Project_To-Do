@@ -9,31 +9,57 @@ angular.module('todoListApp')
     var todo = new Todo();
     todo.name = 'New Todo';
     todo.iscompleted = false;
-    todo.edited = true;
     $scope.todos.unshift(todo);
-    // Start in editing mode
-    $scope.editing = true;
   };
 
   $scope.saveTodos = function() {
-    // Force input blur to ensure model is updated
-    document.activeElement.blur();
+    // Force model update if an input is active
+    if (document.activeElement.tagName === 'INPUT') {
+      document.activeElement.blur();
+    }
 
-    var savePromises = $scope.todos.map(function(todo) {
-      if (!todo.id || todo.edited) {
-        return Todo.save(todo).$promise.then(function(savedTodo) {
-          // Update the existing todo with saved data
-          angular.extend(todo, savedTodo);
-          todo.edited = false;
-          return todo;
+    // Find unsaved todo
+    var unsavedTodo = $scope.todos.find(function(todo) {
+      return !todo.id;
+    });
+
+    if (unsavedTodo) {
+      console.log('Saving new todo:', unsavedTodo);
+      // For new todos
+      Todo.save({}, {
+        name: unsavedTodo.name,
+        iscompleted: unsavedTodo.iscompleted
+      }).$promise.then(function(savedTodo) {
+        console.log('Todo saved successfully:', savedTodo);
+        // Replace the unsaved todo with the saved version
+        var index = $scope.todos.findIndex(function(t) {
+          return !t.id;
+        });
+        if (index !== -1) {
+          $scope.todos[index] = savedTodo;
+        }
+      }).catch(function(error) {
+        console.error('Failed to save todo:', error);
+      });
+    } else {
+      // For existing todos
+      var editedTodos = $scope.todos.filter(function(todo) {
+        return todo.edited && todo.id;
+      });
+
+      if (editedTodos.length > 0) {
+        var promises = editedTodos.map(function(todo) {
+          return Todo.update({ id: todo.id }, todo).$promise;
+        });
+
+        $q.all(promises).then(function(results) {
+          // Clear edited flag after successful update
+          editedTodos.forEach(function(todo) {
+            todo.edited = false;
+          });
         });
       }
-      return $q.when(todo);
-    });
-
-    $q.all(savePromises).then(function() {
-      $scope.todos = Todo.query();
-    });
+    }
   };
 
   $scope.deleteTodo = function(todo, index) {
