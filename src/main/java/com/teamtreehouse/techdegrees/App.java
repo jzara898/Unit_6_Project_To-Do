@@ -68,7 +68,7 @@ public class App {
                 return gson.toJson(todoDao.findAll());
             });
 
-            // Create new todo
+            // Create new to-do
             post("/todos", (req, res) -> {
                 Todo todo = gson.fromJson(req.body(), Todo.class);
                 Todo savedTodo = todoDao.create(todo);
@@ -76,7 +76,7 @@ public class App {
                 return gson.toJson(savedTodo);
             });
 
-            // Update todo
+            // Update to-do
             put("/todos/:id", (req, res) -> {
                 int id = Integer.parseInt(req.params("id"));
                 Todo todo = gson.fromJson(req.body(), Todo.class);
@@ -85,7 +85,7 @@ public class App {
                 return gson.toJson(updatedTodo);
             });
 
-            // Delete todo
+            // Delete to-do
             delete("/todos/:id", (req, res) -> {
                 todoDao.delete(Integer.parseInt(req.params("id")));
                 res.status(204);

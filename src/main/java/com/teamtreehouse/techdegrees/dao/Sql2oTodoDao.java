@@ -43,7 +43,7 @@ public class Sql2oTodoDao implements TodoDao {
             Todo todo = conn.createQuery("SELECT * FROM todos WHERE id = :id")
                     .addParameter("id", id)
                     .executeAndFetchFirst(Todo.class);
-            System.out.println("Found todo with id " + id + ": " + (todo != null));
+            System.out.println("Found to-do with id " + id + ": " + (todo != null));
             return todo;
         }
     }
@@ -59,7 +59,7 @@ public class Sql2oTodoDao implements TodoDao {
                     .getKey();
             todo.setId(id);
             conn.commit();
-            System.out.println("Created new todo with ID: " + id);
+            System.out.println("Created new to-do with ID: " + id);
             return todo;
         }
     }
@@ -87,7 +87,7 @@ public class Sql2oTodoDao implements TodoDao {
                     .addParameter("id", id)
                     .executeUpdate();
             conn.commit();
-            System.out.println("Deleted todo with ID: " + id);
+            System.out.println("Deleted to-do with ID: " + id);
         }
     }
 
@@ -96,7 +96,7 @@ public class Sql2oTodoDao implements TodoDao {
         try (Connection conn = sql2o.beginTransaction()) {
             conn.createQuery(sql).executeUpdate();
             conn.commit();
-            System.out.println("Cleared all todos");
+            System.out.println("Cleared all to-dos");
         }
     }
 }
